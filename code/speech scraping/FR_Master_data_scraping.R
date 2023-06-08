@@ -60,5 +60,5 @@ speeches_EN <- gl_translate(t_string = fr$speeches, target = "en",
 fr$dates <- sub("Publié ", "", fr$dates)
 fr$dates <- dmy(fr$dates)
 
-france <- tibble ()
-write.csv(fr, 'data/speeches/Translated_FR_speeches.csv')
+france <- tibble (topics_FR = fr$topics, dates = fr$dates, speeches_FR = fr$speeches, links = fr$links, topics_EN = topics_EN, speeches_EN = speeches_EN)
+write.csv(france, 'data/speeches/Translated_FR_speeches.csv')
