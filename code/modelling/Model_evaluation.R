@@ -361,7 +361,7 @@ sd(psi_sent_real1)
 ggplot(data = NULL, aes(x = psi_pers_real1)) +
   geom_histogram(fill = "lightblue", color = "black", bins = 30) +
   xlim(-1.5,0.9) +
-  xlab("psi_hap") +  ggtitle("Posterior Distribution of Effect of Persuasion") +
+  xlab("psi_pers") +  ggtitle("Posterior Distribution of Effect of Persuasion") +
   geom_vline(xintercept = mean(psi_pers_real1), linetype = "dashed") +
   geom_vline(xintercept = 0, color = 'red', linetype = 1) +
   #geom_vline(xintercept = quantile(psi_pers_real1, 0.05), linetype = "dotted", color = "red") +
@@ -413,7 +413,7 @@ sd(beta_real1)
 ggplot(data = NULL, aes(x = theta_real1)) +
   geom_histogram(fill = "lightblue", color = "black", bins = 30) +
   xlim(-0.00001,0.00001) +
-  xlab("theta") +  ggtitle("Posterior Distribution of the AR component") +
+  xlab("theta") +  ggtitle("Posterior Distribution of the cases") +
   geom_vline(xintercept = mean(theta_real1), linetype = "dashed") +
   geom_vline(xintercept = 0, color = 'red', linetype = 1) +
   #geom_vline(xintercept = quantile(theta_real1, 0.05), linetype = "dotted", color = "red") +
@@ -488,7 +488,8 @@ ggplot(data = NULL, aes(x = beta_real2)) +
   # geom_vline(xintercept = quantile(beta_real2, 0.975), linetype = "dotted", color = "red") +
   labs(caption = paste("Pr(beta > 0):", round(mean(beta_real2 > 0), 3))) +
   theme_minimal()
-
+mean(beta_real2)
+sd(beta_real2)
 
 # Control variable - cases #
 ggplot(data = NULL, aes(x = theta_real2)) +
@@ -501,6 +502,8 @@ ggplot(data = NULL, aes(x = theta_real2)) +
   # geom_vline(xintercept = quantile(theta_real2, 0.975), linetype = "dotted", color = "red") +
   labs(caption = paste("Pr(theta > 0):", round(mean(theta_real2 > 0), 3))) +
   theme_minimal()
+mean(theta_real2)
+sd(theta_real2)
 # Control variable - cases #
 ggplot(data = NULL, aes(x = theta_real2)) +
   geom_histogram(fill = "lightblue", color = "black", bins = 30) +
@@ -514,7 +517,6 @@ ggplot(data = NULL, aes(x = theta_real2)) +
   theme_minimal()
 mean(theta_real2)
 sd(theta_real2)
-max(model_data_real$cases)
 # the AR component #
 ggplot(data = NULL, aes(x = beta_real2)) +
   geom_histogram(fill = "lightblue", color = "black", bins = 30) +
@@ -528,19 +530,7 @@ ggplot(data = NULL, aes(x = beta_real2)) +
   theme_minimal()
 mean(beta_real2)
 sd(beta_real2)
-# Control variable - cases #
-ggplot(data = NULL, aes(x = theta_real2)) +
-  geom_histogram(fill = "lightblue", color = "black", bins = 30) +
-  xlim(-0.00001, 0.000015) +
-  xlab("theta") +  ggtitle("Posterior Distribution of control variable - cases") +
-  geom_vline(xintercept = 0, color = 'red', linetype = 1) +
-  geom_vline(xintercept = mean(theta_real2), linetype = "dashed") +
-  # geom_vline(xintercept = quantile(theta_real2, 0.025), linetype = "dotted", color = "red") +
-  # geom_vline(xintercept = quantile(theta_real2, 0.975), linetype = "dotted", color = "red") +
-  labs(caption = paste("Pr(theta > 0):", round(mean(theta_real2 > 0), 3))) +
-  theme_minimal()
-mean(theta_real2)
-sd(theta_real2)
+
 # Alpha #
 ggplot(data = NULL, aes(x = alpha_real2)) +
   geom_histogram(fill = "lightblue", color = "black", bins = 30) +
@@ -552,6 +542,8 @@ ggplot(data = NULL, aes(x = alpha_real2)) +
   # geom_vline(xintercept = quantile(alpha_real2, 0.975), linetype = "dotted", color = "red") +
   labs(caption = paste("Pr(alpha > 0):", round(mean(alpha_real2 > 0), 3))) +
   theme_minimal()
+mean(alpha_real2)
+sd(alpha_real2)
 # Convert the matrix into a data frame and reshape it into a long format
 eta_real2_df <- as.data.frame(eta_real2) %>%
   mutate(row_id = 1:n()) %>%
