@@ -10,9 +10,28 @@ This repository contains the code and resources for the master thesis titled "Fr
 
 
 
-Introduction 
-The main goal of this project is to understand the relationship between the rhetoric used in political speeches during the COVID-19 pandemic and changes in political support. The pipeline extracts linguistic features such as sentiment and emotions from a database of over 150 speeches from leaders across the world using prompt engineering on OpenAI's gpt-3.5-turbo model. The effects are measured using a series of Hierarchical Bayesian models implemented via the probabilistic programming language Stan.
+## Introduction 
+The main goal of this project is to understand the relationship between the rhetoric used in political speeches during the COVID-19 pandemic and changes in political support. The pipeline extracts linguistic features such as sentiment and emotions from a database of over 150 speeches from leaders across the world using prompt engineering on OpenAI's `gpt-3.5-turbo` model. The effects are measured using a series of Hierarchical Bayesian models implemented via the probabilistic programming language Stan.
+
 The findings of this study can serve as a basis for crafting political speeches to address future national crises and provide insights for practitioners in computational social science, NLP, and Machine Learning.
+
+## Repository structure
+
+```kotlin
+├── code/
+├── data/
+└── README.md
+```
+
+- `README.md`: This file contains project description, structure and requirements.
+
+- `code/`: This folder contains all the R scripts used for data preparation and modeling.
+
+- `data/`: This folder contains all the raw datasets needed for the modeling and forecasting as well as the output datasets from any transformations and wrangling.
+
+'
+
+## Installation
 Installation
 To set up the project, follow these steps:
 Clone the repository:
