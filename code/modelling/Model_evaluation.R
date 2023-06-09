@@ -265,6 +265,28 @@ pp_check(data1$V, y_rep1, fun = "dens_overlay") + xlim(-7,7)
 pp_check(data2$V, y_rep2, fun = "dens_overlay") + xlim(-7,7)
 
 
+### R-suared statistic ###
+# model1 #
+var_res.emp = apply(data1$V-param.sims1$mu,1,var)
+var_mu.emp = apply(param.sims1$mu,1,var)
+
+rsq1 <- var_mu.emp/ (var_mu.emp + var_res.emp)
+
+hist(rsq1, sub = paste('Rsquared model 1 mean: ',
+                       round(mean(rsq1),3)))
+abline(v=mean(rsq1), lty =2, col = 'blue')
+
+
+# model2 #
+var_res.emp = apply(data2$V-param.sims2$mu,1,var)
+var_mu.emp = apply(param.sims2$mu,1,var)
+
+rsq2 <- var_mu.emp/ (var_mu.emp + var_res.emp)
+
+hist(rsq2, sub = paste('Rsquared model 2 mean: ',
+                       round(mean(rsq2),3)))
+abline(v=mean(rsq2), lty =2, col = 'blue')
+
 #### De-standardization ####
 ### Model1 ###
 real_data <- read.csv('data/model_data.csv')
