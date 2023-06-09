@@ -10,13 +10,13 @@ This repository contains the code and resources for the master thesis titled "Fr
 -   [Troubleshooting](#troubleshooting)
 -   [Contact](#contact)
 
-## Introduction {#introduction}
+## Introduction
 
 The main goal of this project is to understand the relationship between the rhetoric used in political speeches during the COVID-19 pandemic and changes in political support. The pipeline extracts linguistic features such as sentiment and emotions from a database of over 150 speeches from leaders across the world using prompt engineering on OpenAI's `gpt-3.5-turbo` and `text-davinci-003` model. The effects are measured using a series of Hierarchical Bayesian models implemented via the probabilistic programming language Stan.
 
 The findings of this study can serve as a basis for crafting political speeches to address future national crises and provide insights for practitioners in computational social science, NLP, and Machine Learning.
 
-## Repository structure {#repository-structure}
+## Repository structure
 
 ``` kotlin
 ├── code/
@@ -30,11 +30,11 @@ The findings of this study can serve as a basis for crafting political speeches 
 
 -   `data/`: This folder contains all the raw datasets needed for the modeling and forecasting as well as the output datasets from any transformations and wrangling.
 
-## Requirements {#requirements}
+## Requirements
 
 In order to replicate the results of this project, you will need R version 4.2.3. and Rstudio. All the required libraries are indicated in R scripts files.
 
-## Troubleshooting {#troubleshooting}
+## Troubleshooting
 
 If you encounter any issues while setting up or running the project, please check the following:
 
@@ -48,6 +48,6 @@ If you encounter any issues while setting up or running the project, please chec
 
 -    If you still need assistance, please feel free to open an issue on the GitHub repository, and we will do our best to help you resolve the problem.
 
-## Contact {#contact}
+## Contact
 
 If you have any questions or suggestions, please feel free to contact the author at [gustaw.kempa\@gmail.com](mailto:gustaw.kempa@email.com){.email}. Your feedback is greatly appreciated!
