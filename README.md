@@ -50,4 +50,4 @@ If you encounter any issues while setting up or running the project, please chec
 
 ## Contact
 
-If you have any questions or suggestions, please feel free to contact the author at [gustaw.kempa\@gmail.com](mailto:gustaw.kempa@email.com). Your feedback is greatly appreciated!
+If you have any questions or suggestions, please feel free to contact the author at [gustawkempa\@gmail.com](mailto:gustawkempa@gmail.com). Your feedback is greatly appreciated!
