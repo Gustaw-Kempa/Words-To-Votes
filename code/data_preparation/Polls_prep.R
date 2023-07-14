@@ -107,3 +107,24 @@ ggplot(combined_data, aes(x = month, y = support, color = country, group = count
   theme_minimal() +
   theme(legend.title = element_blank()) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+combined_data <- combined_data %>%
+  arrange(country, `year(date)`, `month(date)`) %>%
+  group_by(country) %>%
+  mutate(first_diff = support - lag(support))
+
+ggplot(combined_data, aes(x = first_diff, fill = country, group = country)) +
+  geom_density(color = "black", alpha = 0.3) +
+  labs(title = "Distributions of First Differences of Support",
+       x = "First Difference of Support",
+       y = "Frequency") + xlim(-12,12)
+  scale_fill_discrete()
+  
+export <- combined_data %>% group_by(country) %>% summarise(
+  support_m = mean(support, na.rm=TRUE), sd = sd(support, na.rm = T), diff = mean(first_diff, na.rm =T))
+
+xtable(export)
+
+
+aTSA::adf.test(combined_data$first_diff)

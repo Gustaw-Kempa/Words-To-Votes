@@ -4,6 +4,7 @@ library(loo)
 library(combinat)
 library(tidyverse)
 library(bayesplot)
+library(xtable)
 options(mc.cores = parallel::detectCores())
 set.seed(42)
 options(scipen=99999)
@@ -249,7 +250,26 @@ data2 <- list(N =nrow(model_data), sent = model_data$mean_sentiment,
       head(ESSs2, n = 5)      
       
       
+  
       
+# Creation of table to be extracted - model1
+tab_diff1 <-data.frame(Rhats1[1:8,2], sapply(param.sims1[1:8], mean),  sapply(param.sims1[1:8], sd), Rhats1[1:8,1],ESSs1[1:8,1], ESSs1[1:8,2]
+)
+rownames(tab_diff1) <- NULL  
+tab_diff1[,2:6] <- round(tab_diff1[,2:6],3)
+colnames(tab_diff1) <- c('Parameter names', 'Mean', 'Standard deviation', 'Rhat', 'ESS bulk', 'ESS tail')
+
+#xtable(tab_diff1)
+
+#model2
+tab_diff2 <-data.frame(Rhats2[1:5,2], sapply(param.sims2[1:5], mean),  sapply(param.sims2[1:5], sd), Rhats2[1:5,1],ESSs2[1:5,1], ESSs2[1:5,2]
+)
+rownames(tab_diff2) <- NULL  
+tab_diff2[,2:6] <- round(tab_diff2[,2:6],4)
+colnames(tab_diff2) <- c('Parameter names', 'Mean', 'Standard deviation', 'Rhat', 'ESS bulk', 'ESS tail')
+#xtable(tab_diff2)
+
+
     # Traceplots
 traceplot(fit1, pars = c("alpha", "sigma", "nu", "psi_sent", "psi_pers", "psi_ang", "psi_fear","beta", "theta")) 
 
@@ -271,11 +291,13 @@ var_res.emp = apply(data1$V-param.sims1$mu,1,var)
 var_mu.emp = apply(param.sims1$mu,1,var)
 
 rsq1 <- var_mu.emp/ (var_mu.emp + var_res.emp)
-
+# par(bg=NA)
 hist(rsq1, sub = paste('Rsquared model 1 mean: ',
                        round(mean(rsq1),3)))
 abline(v=mean(rsq1), lty =2, col = 'blue')
 
+# dev.copy(png,'myplot.png')
+# dev.off()
 
 # model2 #
 var_res.emp = apply(data2$V-param.sims2$mu,1,var)
@@ -566,6 +588,14 @@ for (i in 1:7){
   print(paste0('pr(eta_',unique(eta_real2_df$country)[i],") = ",  round(mean(eta_real2[,i] > 0), 3)))
 }
 
-plot(x = c(1:1504), psi_sent_real1)
 
 
+ggplot(real_data, aes(x = seq_along(diff1), y = diff1)) +
+  geom_line(color = "blue") +
+  geom_line(aes(y = diff2), color = "red") +
+  labs(x = "Index", y = "Value") +
+  ggtitle("Line Plot of diff1 and diff2") +
+  scale_x_continuous(breaks = seq(1, length(real_data$diff1), by = 10))
+
+
+cor(real_data$diff1, real_data$diff2)
