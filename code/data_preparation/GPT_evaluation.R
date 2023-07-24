@@ -2,16 +2,14 @@ rm(list = ls())
 
 library(tidyverse) #general data wrangling
 library(openai) # access to GPT-3
-library(lubridate) #making the dates easier
 
 # A unique private openAI API key needs to be provided:
- Sys.setenv(OPENAI_API_KEY = 'xxx')
+ Sys.setenv(OPENAI_API_KEY = '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')
 
  
- openai::list_models()
 
 #select the name of the country to be analysed
-country <- "JP" 
+country <- "DK" 
 
 
 data <- read_delim(paste0("data/speeches/speeches_", country, ".csv"))
@@ -85,15 +83,17 @@ prompt_chat <- c("Evaluate the sentiment and its strength in the the text. Outpu
 )
 
 res <- matrix(NA, nrow = nrow(df), ncol = length(prompt_chat))
+# res <- read.csv("/Users/gustawkempa/Words-To-Votes/data/temp/temp_res_DK6.csv")[,-1]
 colnames(res) <- c("sentiment","happiness","persuasion", "anger","fear",           
 "surprise","informativeness")
+
 for (iter in 1:5){
 for (j in 1:length(prompt_chat)) {
   for (i in which(is.na(res[,j]))) {
     tryCatch({
 
 
-      ans <- create_chat_completion(
+      ans <- create_chat_completion( max_tokens = 5,
   model = "gpt-3.5-turbo", temperature = 0,
   messages = list(
     list("role" = "system",
@@ -109,7 +109,7 @@ for (j in 1:length(prompt_chat)) {
 scores <- readr::parse_number(ans$choices$message.content)
 res[i,j] <- scores
 print(paste(i,j, " score:", scores, Sys.time()))
-Sys.sleep(10) 
+Sys.sleep(5) 
 
 
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
@@ -119,9 +119,11 @@ Sys.sleep(10)
 
 }
 
+
 country_data <- as_tibble(res)
 
 write_csv(country_data, paste0("data/emotions/",country, "/",country, "_emotions.csv"))
+
 
 
 

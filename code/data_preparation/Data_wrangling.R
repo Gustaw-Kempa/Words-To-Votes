@@ -1193,7 +1193,9 @@ rm(list = setdiff(
 
 
 model_data <- rbind(USA_final, UK_final, ES_final, FR_final, DE_final, IT_final,
-                    CA_final, JP_final, NOK_final, DK_final, NL_final)
+                    CA_final, JP_final,DK_final
+                    #, NL_final, NOK_final, AR_final
+                    )
 
 
 
