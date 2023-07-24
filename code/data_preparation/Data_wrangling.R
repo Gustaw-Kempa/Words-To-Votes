@@ -342,7 +342,7 @@ rm(list = setdiff(ls(), c(
 
 
 # FR ####
-?read_delim
+
 
 FR_speeches  <-
   data <- read_delim("data/speeches/Translated_FR_speeches.csv")[,-c(1:2)]
@@ -764,11 +764,436 @@ rm(list = setdiff(
 
 
 
+# JP ####
+
+JP_speeches  <-
+  data <- read_delim("data/speeches/speeches_JP.csv")
+#fixing the dates in dataset
+JP_speeches$dates <- ymd(JP_speeches$dates)
+
+df <- tibble()
+fragm <- c()
+for (i in 1:nrow(JP_speeches)) {
+  #we need to check how many groups to create
+  
+  speech_fragment <-
+    unlist(strsplit(
+      JP_speeches$speeches[i],
+      "(?<=[[:punct:]])\\s(?=[A-Z])",
+      perl = T
+    ))
+  fragm <- c()
+  for (j in 1:floor(length(speech_fragment) / 5)) {
+    fragm[j] <-
+      paste(
+        speech_fragment[j * 5 - 4],
+        speech_fragment[j * 5 - 3],
+        speech_fragment[j * 5 - 2],
+        speech_fragment[j * 5 - 1],
+        speech_fragment[j * 5]
+      )
+    fragm[j] <- gsub('NA', '', fragm[j])
+    fragm[j] <- gsub('\n', '', fragm[j])
+  }
+  df_temp <-
+    data.frame(
+      fragment = fragm,
+      fragment_no = c(1:length(fragm)),
+      date = JP_speeches$dates[i]
+    )
+  df <- rbind.data.frame(df, df_temp)
+}
+JP_speeches <- df
+
+
+# binding the results
+JP_res <- read_csv("data/emotions/JP/JP_emotions.csv")
+
+JP_final <-
+  tibble(JP_speeches, JP_res) %>% group_by(date) %>% summarise(
+    mean_sentiment = mean(sentiment),
+    mean_informativeness = mean(informativeness),
+    mean_persuasion = mean(persuasion),
+    mean_anger = mean(anger),
+    mean_surprise = mean(surprise),
+    mean_happiness = mean(happiness),
+    mean_fear = mean(fear),
+    sd_sentiment = sd(sentiment),
+    sd_informativeness = sd(informativeness),
+    sd_fear = sd(fear),
+    sd_persuasion = sd(persuasion),
+    sd_anger = sd(anger),
+    sd_surprise = sd(surprise),
+    sd_happiness = sd(happiness)
+  )
+
+# Replacing NA's in columns with SD where there is only one chunk of text
+JP_final[, c(9:15)] <-
+  apply(JP_final[, c(9:15)], 2, function(x)
+    replace(x, is.na(x), 0))
+
+# adding the week number (format year, week no)
+JP_final$week <- strftime(JP_final$date, format = "%y%V")
+
+# reading the polls data
+
+JP_polls <- read_csv('data/polls/JP_polls.csv')
+JP_polls <-
+  JP_polls %>% group_by(week) %>% summarise(support = mean(LDP))
+JP_polls <- JP_polls %>%  mutate(
+  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff2 = lead(support, n = 2) - lead(support, n =
+                                        1)
+)
+JP_final$week <- as.numeric(JP_final$week)
+JP_polls$week <- as.numeric(JP_polls$week)
+# joining the two dataframes
+
+JP_final <-
+  JP_final %>% left_join (JP_polls, by = 'week') %>% na.omit()
+
+# data needs to be aggregated
+
+JP_cases <- cases_data$Japan
+
+
+JP_final <- JP_final %>% left_join(tibble(week = cases_data$week, cases = JP_cases), by ='week')
+
+
+
+JP_final$country <- "JP"
+
+rm(list = setdiff(
+  ls(),
+  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" ,"cases_data")
+))
+
+
+# DK ####
+
+DK_speeches  <-
+  data <- read_delim("data/speeches/speeches_DK.csv")
+#fixing the dates in dataset
+DK_speeches$dates <- ymd(DK_speeches$dates)
+
+df <- tibble()
+fragm <- c()
+for (i in 1:nrow(DK_speeches)) {
+  #we need to check how many groups to create
+  
+  speech_fragment <-
+    unlist(strsplit(
+      DK_speeches$speeches_EN[i],
+      "(?<=[[:punct:]])\\s(?=[A-Z])",
+      perl = T
+    ))
+  fragm <- c()
+  for (j in 1:floor(length(speech_fragment) / 5)) {
+    fragm[j] <-
+      paste(
+        speech_fragment[j * 5 - 4],
+        speech_fragment[j * 5 - 3],
+        speech_fragment[j * 5 - 2],
+        speech_fragment[j * 5 - 1],
+        speech_fragment[j * 5]
+      )
+    fragm[j] <- gsub('NA', '', fragm[j])
+    fragm[j] <- gsub('\n', '', fragm[j])
+  }
+  df_temp <-
+    data.frame(
+      fragment = fragm,
+      fragment_no = c(1:length(fragm)),
+      date = DK_speeches$dates[i]
+    )
+  df <- rbind.data.frame(df, df_temp)
+}
+DK_speeches <- df
+
+
+# binding the results
+DK_res <- read_csv("data/emotions/DK/DK_emotions.csv")
+
+DK_final <-
+  tibble(DK_speeches, DK_res) %>% group_by(date) %>% summarise(
+    mean_sentiment = mean(sentiment),
+    mean_informativeness = mean(informativeness),
+    mean_persuasion = mean(persuasion),
+    mean_anger = mean(anger),
+    mean_surprise = mean(surprise),
+    mean_happiness = mean(happiness),
+    mean_fear = mean(fear),
+    sd_sentiment = sd(sentiment),
+    sd_informativeness = sd(informativeness),
+    sd_fear = sd(fear),
+    sd_persuasion = sd(persuasion),
+    sd_anger = sd(anger),
+    sd_surprise = sd(surprise),
+    sd_happiness = sd(happiness)
+  )
+
+# Replacing NA's in columns with SD where there is only one chunk of text
+DK_final[, c(9:15)] <-
+  apply(DK_final[, c(9:15)], 2, function(x)
+    replace(x, is.na(x), 0))
+
+# adding the week number (format year, week no)
+DK_final$week <- strftime(DK_final$date, format = "%y%V")
+
+# reading the polls data
+
+DK_polls <- read_csv('data/polls/DK_polls.csv')
+DK_polls <-
+  DK_polls %>% group_by(week) %>% summarise(support = mean(A))
+DK_polls <- DK_polls %>%  mutate(
+  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff2 = lead(support, n = 2) - lead(support, n =
+                                        1)
+)
+DK_final$week <- as.numeric(DK_final$week)
+DK_polls$week <- as.numeric(DK_polls$week)
+# joining the two dataframes
+
+DK_final <-
+  DK_final %>% left_join (DK_polls, by = 'week') %>% na.omit()
+
+# data needs to be aggregated
+
+DK_cases <- cases_data$Denmark...105 + cases_data$Denmark...106 + cases_data$Denmark...107
+
+
+DK_final <- DK_final %>% left_join(tibble(week = cases_data$week, cases = DK_cases), by ='week')
+
+
+
+DK_final$country <- "DK"
+
+rm(list = setdiff(
+  ls(),
+  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" , "DK_final","cases_data")
+))
+
+
+# NOK ####
+
+NOK_speeches  <-
+  data <- read_delim("data/speeches/speeches_NOK.csv")
+#fixing the dates in dataset
+NOK_speeches$dates <- ymd(NOK_speeches$dates)
+
+df <- tibble()
+fragm <- c()
+for (i in 1:nrow(NOK_speeches)) {
+  #we need to check how many groups to create
+  
+  speech_fragment <-
+    unlist(strsplit(
+      NOK_speeches$speeches[i],
+      "(?<=[[:punct:]])\\s(?=[A-Z])",
+      perl = T
+    ))
+  fragm <- c()
+  for (j in 1:floor(length(speech_fragment) / 5)) {
+    fragm[j] <-
+      paste(
+        speech_fragment[j * 5 - 4],
+        speech_fragment[j * 5 - 3],
+        speech_fragment[j * 5 - 2],
+        speech_fragment[j * 5 - 1],
+        speech_fragment[j * 5]
+      )
+    fragm[j] <- gsub('NA', '', fragm[j])
+    fragm[j] <- gsub('\n', '', fragm[j])
+  }
+  df_temp <-
+    data.frame(
+      fragment = fragm,
+      fragment_no = c(1:length(fragm)),
+      date = NOK_speeches$dates[i]
+    )
+  df <- rbind.data.frame(df, df_temp)
+}
+NOK_speeches <- df
+
+
+# binding the results
+NOK_res <- read_csv("data/emotions/NOK/NOK_emotions.csv")
+
+NOK_final <-
+  tibble(NOK_speeches, NOK_res) %>% group_by(date) %>% summarise(
+    mean_sentiment = mean(sentiment),
+    mean_informativeness = mean(informativeness),
+    mean_persuasion = mean(persuasion),
+    mean_anger = mean(anger),
+    mean_surprise = mean(surprise),
+    mean_happiness = mean(happiness),
+    mean_fear = mean(fear),
+    sd_sentiment = sd(sentiment),
+    sd_informativeness = sd(informativeness),
+    sd_fear = sd(fear),
+    sd_persuasion = sd(persuasion),
+    sd_anger = sd(anger),
+    sd_surprise = sd(surprise),
+    sd_happiness = sd(happiness)
+  )
+
+# Replacing NA's in columns with SD where there is only one chunk of text
+NOK_final[, c(9:15)] <-
+  apply(NOK_final[, c(9:15)], 2, function(x)
+    replace(x, is.na(x), 0))
+
+# adding the week number (format year, week no)
+NOK_final$week <- strftime(NOK_final$date, format = "%y%V")
+
+# reading the polls data
+
+NOK_polls <- read_csv('data/polls/NOK_polls.csv')
+NOK_polls <-
+  NOK_polls %>% group_by(week) %>% summarise(support = mean(H))
+NOK_polls <- NOK_polls %>%  mutate(
+  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff2 = lead(support, n = 2) - lead(support, n =
+                                        1)
+)
+NOK_final$week <- as.numeric(NOK_final$week)
+NOK_polls$week <- as.numeric(NOK_polls$week)
+# joining the two dataframes
+
+NOK_final <-
+  NOK_final %>% left_join (NOK_polls, by = 'week') %>% na.omit()
+
+# data needs to be aggregated
+
+NOK_cases <- cases_data$Norway
+
+
+NOK_final <- NOK_final %>% left_join(tibble(week = cases_data$week, cases = NOK_cases), by ='week')
+
+
+
+NOK_final$country <- "NOK"
+
+rm(list = setdiff(
+  ls(),
+  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" ,"DK_final", "NOK_final","cases_data")
+))
 
 
 
 
-model_data <- rbind(USA_final, UK_final, ES_final, FR_final, DE_final, IT_final, CA_final)
+# NL ####
+
+NL_speeches  <-
+  data <- read_delim("data/speeches/speeches_NL.csv")
+#fixing the dates in dataset
+NL_speeches$dates <- ymd(NL_speeches$dates)
+
+df <- tibble()
+fragm <- c()
+for (i in 1:nrow(NL_speeches)) {
+  #we need to check how many groups to create
+  
+  speech_fragment <-
+    unlist(strsplit(
+      NL_speeches$speeches_EN[i],
+      "(?<=[[:punct:]])\\s(?=[A-Z])",
+      perl = T
+    ))
+  fragm <- c()
+  for (j in 1:floor(length(speech_fragment) / 5)) {
+    fragm[j] <-
+      paste(
+        speech_fragment[j * 5 - 4],
+        speech_fragment[j * 5 - 3],
+        speech_fragment[j * 5 - 2],
+        speech_fragment[j * 5 - 1],
+        speech_fragment[j * 5]
+      )
+    fragm[j] <- gsub('NA', '', fragm[j])
+    fragm[j] <- gsub('\n', '', fragm[j])
+  }
+  df_temp <-
+    data.frame(
+      fragment = fragm,
+      fragment_no = c(1:length(fragm)),
+      date = NL_speeches$dates[i]
+    )
+  df <- rbind.data.frame(df, df_temp)
+}
+NL_speeches <- df
+
+
+# binding the results
+NL_res <- read_csv("data/emotions/NL/NL_emotions.csv")
+
+NL_final <-
+  tibble(NL_speeches, NL_res) %>% group_by(date) %>% summarise(
+    mean_sentiment = mean(sentiment),
+    mean_informativeness = mean(informativeness),
+    mean_persuasion = mean(persuasion),
+    mean_anger = mean(anger),
+    mean_surprise = mean(surprise),
+    mean_happiness = mean(happiness),
+    mean_fear = mean(fear),
+    sd_sentiment = sd(sentiment),
+    sd_informativeness = sd(informativeness),
+    sd_fear = sd(fear),
+    sd_persuasion = sd(persuasion),
+    sd_anger = sd(anger),
+    sd_surprise = sd(surprise),
+    sd_happiness = sd(happiness)
+  )
+
+# Replacing NA's in columns with SD where there is only one chunk of text
+NL_final[, c(9:15)] <-
+  apply(NL_final[, c(9:15)], 2, function(x)
+    replace(x, is.na(x), 0))
+
+# adding the week number (format year, week no)
+NL_final$week <- strftime(NL_final$date, format = "%y%V")
+
+# reading the polls data
+
+NL_polls <- read_csv('data/polls/NL_polls.csv')
+NL_polls <-
+  NL_polls %>% group_by(week) %>% summarise(support = mean(VVD))
+NL_polls <- NL_polls %>%  mutate(
+  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff2 = lead(support, n = 2) - lead(support, n =
+                                        1)
+)
+NL_final$week <- as.numeric(NL_final$week)
+NL_polls$week <- as.numeric(NL_polls$week)
+# joining the two dataframes
+
+NL_final <-
+  NL_final %>% left_join (NL_polls, by = 'week') %>% na.omit()
+
+# data needs to be aggregated
+
+NL_cases <- cases_data$Netherlands...198 + cases_data$Netherlands...199 + cases_data$Netherlands...200 +
+  cases_data$Netherlands...201 + cases_data$Netherlands...202
+
+
+NL_final <- NL_final %>% left_join(tibble(week = cases_data$week, cases = NL_cases), by ='week')
+
+
+
+NL_final$country <- "NL"
+
+rm(list = setdiff(
+  ls(),
+  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" ,"DK_final","NOK_final",  "NL_final","cases_data")
+))
+
+
+
+
+
+
+
+model_data <- rbind(USA_final, UK_final, ES_final, FR_final, DE_final, IT_final,
+                    CA_final, JP_final, NOK_final, DK_final, NL_final)
 
 
 

@@ -5,16 +5,22 @@ library(openai) # access to GPT-3
 library(lubridate) #making the dates easier
 
 # A unique private openAI API key needs to be provided:
-# Sys.setenv(OPENAI_API_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+ Sys.setenv(OPENAI_API_KEY = 'xxx')
 
+ 
+ openai::list_models()
 
 #select the name of the country to be analysed
-country <- "CA" 
+country <- "JP" 
 
 
 data <- read_delim(paste0("data/speeches/speeches_", country, ".csv"))
 
+# Check if there is a column speeches_EN and change it to speeches
 
+if ("speeches_EN" %in% colnames(data)) {
+  colnames(data)[colnames(data) == "speeches_EN"] <- "speeches"
+}
 
 prompts <-tibble(prompts = c("Evaluate the sentiment and its strength in the the text. Output only a number from -5 (very negative) to 5 (very positive) with 0.1 increments. Text:'",
              "Detect the emotion of happiness in the following text. Evaluate strength of the emotion on a scale. Output only a number from 0 (no happiness) to 5 (very happy) with 0.1 increments. Text: '",
@@ -67,9 +73,8 @@ for (i in 1:nrow(data)) {
 }
 
 
-# Implementing the gpt-3.5-turbo in the completions
-res <- matrix(NA, nrow = nrow(df), ncol = nrow(prompts))
-colnames(res) <- prompts$emotions
+#### Implementing the gpt-3.5-turbo in the completions (cheaper) ####
+
 prompt_chat <- c("Evaluate the sentiment and its strength in the the text. Output only a number from -5 (very negative) to 5 (very positive) with 0.1 increments. Do not provide any explanation.",
                                   "Detect the emotion of happiness in the following text. Evaluate strength of the emotion on a scale. Output only a number from 0 (no happiness) to 5 (very happy) with 0.1 increments. Do not provide any explanation. ",
                                   "Detect the persuasion in the following text. Evaluate strength of the emotion on a scale. Output only a number from 0 (no persuasion) to 5 (very persuasive) with 0.1 increments. Do not provide any explanation.",
@@ -79,25 +84,32 @@ prompt_chat <- c("Evaluate the sentiment and its strength in the the text. Outpu
                                   "Detect the informativeness in the following text. Evaluate its strength on a scale. Output only a number from 0 (no informativeness) to 5 (very informative) with 0.1 increments. Do not provide any explanation."
 )
 
+res <- matrix(NA, nrow = nrow(df), ncol = length(prompt_chat))
+colnames(res) <- c("sentiment","happiness","persuasion", "anger","fear",           
+"surprise","informativeness")
+for (iter in 1:5){
 for (j in 1:length(prompt_chat)) {
   for (i in which(is.na(res[,j]))) {
     tryCatch({
 
-      
+
       ans <- create_chat_completion(
-  model = "gpt-3.5-turbo", temperature = 0, 
+  model = "gpt-3.5-turbo", temperature = 0,
   messages = list(
     list("role" = "system",
          "content" = prompt_chat[j]),
     list("role" = "user",
          "content" = df$fragment[i])
-  )
-)
+  ))
+
+
+  
+
 
 scores <- readr::parse_number(ans$choices$message.content)
 res[i,j] <- scores
 print(paste(i,j, " score:", scores, Sys.time()))
-Sys.sleep(10)
+Sys.sleep(10) 
 
 
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
@@ -105,7 +117,7 @@ Sys.sleep(10)
   write.csv(res, paste0("data/temp/temp_res_", country,j, ".csv" ))
 }
 
-res[res>5]
+}
 
 country_data <- as_tibble(res)
 
