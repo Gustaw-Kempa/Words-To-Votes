@@ -56,17 +56,7 @@ UK_speeches <- df
 
 
 # binding the results
-UK_res <-
-  tibble(
-    sentiment = read.csv("data/emotions/UK/sent_temp.csv")[, 2],
-    happiness = read.csv('data/emotions/UK/hap_temp.csv')[, 2],
-    persuasion = read.csv('data/emotions/UK/pers_temp.csv')[, 2],
-    anger = read.csv('data/emotions/UK/ang_temp.csv')[, 2],
-    fear = read.csv('data/emotions/UK/fear_temp.csv')[, 2],
-    surprise = read.csv('data/emotions/UK/surp_temp.csv')[, 2],
-    informativeness = read.csv('data/emotions/UK/inf_temp.csv')[, 2]
-    
-  )
+UK_res <- read.csv("data/emotions/UK/UK_emotions.csv")
 # Creation of final dataset to the model - with the means and standard deviations of each variable
 UK_final <-
   tibble(UK_speeches, UK_res) %>% group_by(date) %>% summarise(
@@ -77,13 +67,15 @@ UK_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -132,7 +124,7 @@ rm(list = setdiff(ls(), c("UK_final", "cases_data")))
 # USA ####
 
 USA_speeches  <-
-  read_delim("data/speeches/speeches_USA.tsv")[,-1]
+  read_delim("data/speeches/speeches_USA.tsv")[, -1]
 #fixing the dates in dataset
 USA_speeches$dates <- mdy(USA_speeches$dates)
 
@@ -183,13 +175,15 @@ USA_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 # Replacing NA's in columns with SD where there is only one chunk of text
 USA_final[, c(9:15)] <-
@@ -205,7 +199,8 @@ USA_polls <- read_csv('data/polls/USA_polls.csv')
 USA_polls <-
   USA_polls %>% group_by(week) %>% summarise(support = mean(rep))
 USA_polls <- USA_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -292,6 +287,7 @@ ES_final <- ES_final %>%
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
@@ -299,6 +295,7 @@ ES_final <- ES_final %>%
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
     sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust),
     .groups = 'keep'
   )
 
@@ -320,7 +317,8 @@ ES_polls <- read_csv('data/polls/ES_polls.csv')
 ES_polls <-
   ES_polls %>% group_by(week) %>% summarise(support = mean(PSOE))
 ES_polls <- ES_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -345,7 +343,8 @@ rm(list = setdiff(ls(), c(
 
 
 FR_speeches  <-
-  data <- read_delim("data/speeches/Translated_FR_speeches.csv")[,-c(1:2)]
+  data <-
+  read_delim("data/speeches/speeches_FR_translated.csv")[, -c(1:2)]
 #fixing the dates in dataset
 FR_speeches$dates <- ymd(FR_speeches$dates)
 
@@ -396,13 +395,15 @@ FR_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -419,7 +420,8 @@ FR_polls <- read_csv('data/polls/FR_polls.csv')
 FR_polls <-
   FR_polls %>% group_by(week) %>% summarise(support = mean(macron_approve))
 FR_polls <- FR_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -502,13 +504,15 @@ DE_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -525,7 +529,8 @@ DE_polls <- read_csv('data/polls/DE_polls.csv')
 DE_polls <-
   DE_polls %>% group_by(week) %>% summarise(support = mean(Union))
 DE_polls <- DE_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -547,7 +552,14 @@ DE_final$country <- "DE"
 
 rm(list = setdiff(
   ls(),
-  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final" ,"cases_data")
+  c(
+    "USA_final",
+    "UK_final",
+    "ES_final",
+    "FR_final",
+    "DE_final" ,
+    "cases_data"
+  )
 ))
 
 # IT ####
@@ -593,7 +605,8 @@ IT_speeches <- df
 
 
 # binding the results
-IT_res <- read_csv("data/emotions/IT/IT_emotions.csv")[c(1:length(IT_speeches$fragment)),]
+IT_res <-
+  read_csv("data/emotions/IT/IT_emotions.csv")[c(1:length(IT_speeches$fragment)), ]
 
 IT_final <-
   tibble(IT_speeches, IT_res) %>% group_by(date) %>% summarise(
@@ -604,13 +617,15 @@ IT_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -627,7 +642,8 @@ IT_polls <- read_csv('data/polls/IT_polls.csv')
 IT_polls <-
   IT_polls %>% group_by(week) %>% summarise(support = mean(M5S))
 IT_polls <- IT_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -649,7 +665,15 @@ IT_final$country <- "IT"
 
 rm(list = setdiff(
   ls(),
-  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" ,"cases_data")
+  c(
+    "USA_final",
+    "UK_final",
+    "ES_final",
+    "FR_final",
+    "DE_final",
+    "IT_final" ,
+    "cases_data"
+  )
 ))
 
 
@@ -707,13 +731,15 @@ CA_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -730,7 +756,8 @@ CA_polls <- read_csv('data/polls/CA_polls.csv')
 CA_polls <-
   CA_polls %>% group_by(week) %>% summarise(support = mean(support))
 CA_polls <- CA_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -744,12 +771,15 @@ CA_final <-
 # data needs to be aggregated
 
 
-CA_cases <- cases_data$Canada...42 + cases_data$Canada...43 + cases_data$Canada...44 + cases_data$Canada...45+
+CA_cases <-
+  cases_data$Canada...42 + cases_data$Canada...43 + cases_data$Canada...44 + cases_data$Canada...45 +
   cases_data$Canada...46 + cases_data$Canada...47 + cases_data$Canada...48 + cases_data$Canada...49 + cases_data$Canada...50 +
-   cases_data$Canada...51 + cases_data$Canada...52 + cases_data$Canada...53 + cases_data$Canada...54 + cases_data$Canada...57
+  cases_data$Canada...51 + cases_data$Canada...52 + cases_data$Canada...53 + cases_data$Canada...54 + cases_data$Canada...57
 
 
-CA_final <- CA_final %>% left_join(tibble(week = cases_data$week, cases = CA_cases), by ='week')
+CA_final <-
+  CA_final %>% left_join(tibble(week = cases_data$week, cases = CA_cases), by =
+                           'week')
 
 
 
@@ -757,7 +787,16 @@ CA_final$country <- "CA"
 
 rm(list = setdiff(
   ls(),
-  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final" ,"cases_data")
+  c(
+    "USA_final",
+    "UK_final",
+    "ES_final",
+    "FR_final",
+    "DE_final",
+    "IT_final" ,
+    "CA_final" ,
+    "cases_data"
+  )
 ))
 
 
@@ -818,13 +857,15 @@ JP_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -841,7 +882,8 @@ JP_polls <- read_csv('data/polls/JP_polls.csv')
 JP_polls <-
   JP_polls %>% group_by(week) %>% summarise(support = mean(LDP))
 JP_polls <- JP_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -857,7 +899,9 @@ JP_final <-
 JP_cases <- cases_data$Japan
 
 
-JP_final <- JP_final %>% left_join(tibble(week = cases_data$week, cases = JP_cases), by ='week')
+JP_final <-
+  JP_final %>% left_join(tibble(week = cases_data$week, cases = JP_cases), by =
+                           'week')
 
 
 
@@ -865,7 +909,17 @@ JP_final$country <- "JP"
 
 rm(list = setdiff(
   ls(),
-  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" ,"cases_data")
+  c(
+    "USA_final",
+    "UK_final",
+    "ES_final",
+    "FR_final",
+    "DE_final",
+    "IT_final" ,
+    "CA_final",
+    "JP_final" ,
+    "cases_data"
+  )
 ))
 
 
@@ -923,13 +977,15 @@ DK_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -946,7 +1002,8 @@ DK_polls <- read_csv('data/polls/DK_polls.csv')
 DK_polls <-
   DK_polls %>% group_by(week) %>% summarise(support = mean(A))
 DK_polls <- DK_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -959,10 +1016,13 @@ DK_final <-
 
 # data needs to be aggregated
 
-DK_cases <- cases_data$Denmark...105 + cases_data$Denmark...106 + cases_data$Denmark...107
+DK_cases <-
+  cases_data$Denmark...105 + cases_data$Denmark...106 + cases_data$Denmark...107
 
 
-DK_final <- DK_final %>% left_join(tibble(week = cases_data$week, cases = DK_cases), by ='week')
+DK_final <-
+  DK_final %>% left_join(tibble(week = cases_data$week, cases = DK_cases), by =
+                           'week')
 
 
 
@@ -970,7 +1030,18 @@ DK_final$country <- "DK"
 
 rm(list = setdiff(
   ls(),
-  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" , "DK_final","cases_data")
+  c(
+    "USA_final",
+    "UK_final",
+    "ES_final",
+    "FR_final",
+    "DE_final",
+    "IT_final" ,
+    "CA_final",
+    "JP_final" ,
+    "DK_final",
+    "cases_data"
+  )
 ))
 
 
@@ -1028,13 +1099,15 @@ NOK_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -1051,7 +1124,8 @@ NOK_polls <- read_csv('data/polls/NOK_polls.csv')
 NOK_polls <-
   NOK_polls %>% group_by(week) %>% summarise(support = mean(H))
 NOK_polls <- NOK_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -1067,7 +1141,9 @@ NOK_final <-
 NOK_cases <- cases_data$Norway
 
 
-NOK_final <- NOK_final %>% left_join(tibble(week = cases_data$week, cases = NOK_cases), by ='week')
+NOK_final <-
+  NOK_final %>% left_join(tibble(week = cases_data$week, cases = NOK_cases), by =
+                            'week')
 
 
 
@@ -1075,7 +1151,19 @@ NOK_final$country <- "NOK"
 
 rm(list = setdiff(
   ls(),
-  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" ,"DK_final", "NOK_final","cases_data")
+  c(
+    "USA_final",
+    "UK_final",
+    "ES_final",
+    "FR_final",
+    "DE_final",
+    "IT_final" ,
+    "CA_final",
+    "JP_final" ,
+    "DK_final",
+    "NOK_final",
+    "cases_data"
+  )
 ))
 
 
@@ -1135,13 +1223,15 @@ NL_final <-
     mean_surprise = mean(surprise),
     mean_happiness = mean(happiness),
     mean_fear = mean(fear),
+    mean_disgust = mean(disgust),
     sd_sentiment = sd(sentiment),
     sd_informativeness = sd(informativeness),
     sd_fear = sd(fear),
     sd_persuasion = sd(persuasion),
     sd_anger = sd(anger),
     sd_surprise = sd(surprise),
-    sd_happiness = sd(happiness)
+    sd_happiness = sd(happiness),
+    sd_disgust = sd(disgust)
   )
 
 # Replacing NA's in columns with SD where there is only one chunk of text
@@ -1158,7 +1248,8 @@ NL_polls <- read_csv('data/polls/NL_polls.csv')
 NL_polls <-
   NL_polls %>% group_by(week) %>% summarise(support = mean(VVD))
 NL_polls <- NL_polls %>%  mutate(
-  diff0 = support - lag(support),   diff1 = lead(support) - support,
+  diff0 = support - lag(support),
+  diff1 = lead(support) - support,
   diff2 = lead(support, n = 2) - lead(support, n =
                                         1)
 )
@@ -1171,11 +1262,14 @@ NL_final <-
 
 # data needs to be aggregated
 
-NL_cases <- cases_data$Netherlands...198 + cases_data$Netherlands...199 + cases_data$Netherlands...200 +
+NL_cases <-
+  cases_data$Netherlands...198 + cases_data$Netherlands...199 + cases_data$Netherlands...200 +
   cases_data$Netherlands...201 + cases_data$Netherlands...202
 
 
-NL_final <- NL_final %>% left_join(tibble(week = cases_data$week, cases = NL_cases), by ='week')
+NL_final <-
+  NL_final %>% left_join(tibble(week = cases_data$week, cases = NL_cases), by =
+                           'week')
 
 
 
@@ -1183,23 +1277,83 @@ NL_final$country <- "NL"
 
 rm(list = setdiff(
   ls(),
-  c("USA_final", "UK_final", "ES_final", "FR_final", "DE_final", "IT_final" , "CA_final", "JP_final" ,"DK_final","NOK_final",  "NL_final","cases_data")
+  c(
+    "USA_final",
+    "UK_final",
+    "ES_final",
+    "FR_final",
+    "DE_final",
+    "IT_final" ,
+    "CA_final",
+    "JP_final" ,
+    "DK_final",
+    "NOK_final",
+    "NL_final",
+    "cases_data"
+  )
 ))
 
 
 
+model_data <-
+  rbind(
+    USA_final,
+    UK_final,
+    ES_final,
+    FR_final,
+    DE_final,
+    IT_final,
+    CA_final,
+    JP_final,
+    DK_final,
+    NL_final,
+    NOK_final
+  )
 
 
+### Adding the severity index ####
 
+index <-
+  read.csv(
+    "https://proxy.hxlstandard.org/data.csv?tagger-match-all=on&tagger-01-header=countryname&tagger-01-tag=%23country&tagger-02-header=countrycode&tagger-02-tag=%23country%2Bcode&tagger-03-header=date&tagger-03-tag=%23date&tagger-04-header=StringencyIndex_Average_ForDisplay&tagger-04-tag=%23severity%2Bstringency%2Bnum&url=https%3A%2F%2Fraw.githubusercontent.com%2FOxCGRT%2Fcovid-policy-tracker%2Fmaster%2Fdata%2FOxCGRT_nat_latest.csv&header-row=1&dest=data_view&_gl=1*lfi03v*_ga*MTU5ODc2ODEyNi4xNjkwNDYyMzAy*_ga_E60ZNX2F68*MTY5MDQ2MjMwMS4xLjEuMTY5MDQ2MjMzMi4yOS4wLjA."
+  )[-1, c(1, 2, 6, 54)]
+countries <-
+  c(
+    "United Kingdom",
+    "United States",
+    "Italy",
+    "France",
+    "Spain",
+    "Germany",
+    "Canada",
+    "Norway",
+    "Netherlands",
+    "Japan",
+    "Denmark"
+  )
+countries_map <-
+  c(
+    "United Kingdom" = "UK",
+    "United States" = "USA",
+    "Italy" = "IT",
+    "France" = "FR",
+    "Spain" = "ES",
+    "Germany" = "DE",
+    "Canada" = "CA",
+    "Norway" = "NOK",
+    "Netherlands" = "NL",
+    "Japan" = "JP",
+    "Denmark" = "DK"
+  )
+index$Date <- ymd(index$Date)
+index$week <- strftime(index$Date, format = "%y%V")
+index <- index %>% group_by(week, CountryName) %>%
+  summarise(index = mean(StringencyIndex_Average)) %>% filter(CountryName %in% countries)
 
-model_data <- rbind(USA_final, UK_final, ES_final, FR_final, DE_final, IT_final,
-                    CA_final, JP_final,DK_final
-                    #, NL_final, NOK_final, AR_final
-                    )
-
-
-
-
+index <- index %>% mutate(CountryName = countries_map[CountryName])
+index$week <- as.numeric(index$week)
+model_data <-
+  model_data %>% left_join(index, by = c("country" = "CountryName", "week"))
 
 write_csv(model_data, "data/model_data.csv")
 
@@ -1208,28 +1362,41 @@ write_csv(model_data, "data/model_data.csv")
 
 #### VISUALIZATIONS ####
 library(reshape2)
-plotting_df <- model_data[,c(1:8,22)]
-colnames(plotting_df) <- c('Date', 'Sentiment', 'Informativeness', 'Persuasion',
-                           'Anger', "Surprise", "Happiness", "Fear", "Country")
+plotting_df <- model_data[, c(1:8, 22)]
+colnames(plotting_df) <-
+  c(
+    'Date',
+    'Sentiment',
+    'Informativeness',
+    'Persuasion',
+    'Anger',
+    "Surprise",
+    "Happiness",
+    "Fear",
+    "Country"
+  )
 
 plotting_df$Date <- ymd(plotting_df$Date)
 
-plotting_df <- reshape2::melt(plotting_df, id.vars =(c(1,9)))
+plotting_df <- reshape2::melt(plotting_df, id.vars = (c(1, 9)))
 
 
-ggplot(data = plotting_df, aes(x = Date, y = value, color = variable, group = variable)) + 
-  facet_wrap(~Country, ncol = 1) +  # Make the plots stack vertically
-  geom_line() +   
-  scale_color_discrete() + 
-  theme_minimal()  + xlab(NULL) + ylab(NULL) + ylim(c(0,5)) + 
+ggplot(data = plotting_df, aes(
+  x = Date,
+  y = value,
+  color = variable,
+  group = variable
+)) +
+  facet_wrap( ~ Country, ncol = 1) +  # Make the plots stack vertically
+  geom_line() +
+  scale_color_discrete() +
+  theme_minimal()  + xlab(NULL) + ylab(NULL) + ylim(c(0, 5)) +
   theme(
-    legend.title = element_blank(), 
-    legend.position = "bottom",  # Move the legend to the bottom
+    legend.title = element_blank(),
+    legend.position = "bottom",
+    # Move the legend to the bottom
     axis.text.x = element_text(angle = 45, hjust = 1)
   ) +
   guides(color = guide_legend(direction = "horizontal")) +  # Make the legend horizontal
   scale_x_date(date_labels = "%m/%y", date_breaks = "2 months") +
   labs(title = "Features extracted from the transcripts")
-
-
-

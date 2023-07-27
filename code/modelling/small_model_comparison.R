@@ -1,4 +1,15 @@
 #### For models with diff1 ####
+
+# TODO: ADD PARITAL POOLING TO THE OUTPUT!!!
+# TODO: MAYBE PARTIAL POOLING ON THE AR COMPONENT/ THETA
+# TODO: ADD THE POLICY INDEX (STRINGENT INDEX FROM OXFORD POLICY DATABASE)
+# TODO: ADD DISGUST AS EMOTION
+# TODO: Maybe the first diff of the severity and maybe the severity itself (as a comparison between countries)
+# TODO: Maybe add quartiles (1st and third ) for the emotions 
+# TODO: Do not test other combinations apart from student-t
+
+
+
 rm(list = ls())
 library(rstan)
 library(loo)
@@ -10,7 +21,8 @@ set.seed(42)
 # Define your data
 model_data <- read.csv('data/model_data.csv')
 model_data <- model_data %>% na.omit()
-model_data[,c(2:15,17:21)] <- scale(model_data[,c(2:15,17:21)])
+model_data <- model_data %>%
+  mutate_at(vars(-date, -week, -country), ~map_dbl(scale(.), 1))
 model_data$country_id <- as.integer(as.factor(model_data$country))
 
 # first analysis is for the dependent variable diff1
@@ -18,16 +30,16 @@ data <- list(N =nrow(model_data), sent = model_data$mean_sentiment,
              info = model_data$mean_informativeness,
              pers = model_data$mean_persuasion, ang = model_data$mean_anger,
              surp = model_data$mean_surprise, hap = model_data$mean_happiness,
-             fear = model_data$mean_fear,
+             fear = model_data$mean_fear, disgust = model_data$mean_disgust,
              diff0 = model_data$diff0,
              country_id = model_data$country_id,
              N_country = max(model_data$country_id),
-             cases = model_data$cases,
+             cases = model_data$index,
              V = model_data$diff1)
 
-emotions <- c( "info", "sent","pers","ang", "surp", "hap", "fear")
+emotions <- c( "info", "sent","pers","ang", "surp", "hap", "fear", "disgust")
 
-distributions <- c("normal", "student_t", "laplace", "logistic")
+distributions <- c("normal", "laplace", "logistic","student_t")
 
 loo_results <- list()
 estimates <- list()
@@ -169,26 +181,20 @@ emotion <- emotions[i]
 
 
 
-
 # combining the two lists
 full_diff1 <- Map(function(x, y) list(x, y), loo_results, estimates)
 # sorting the results
 full_diff1 <- full_diff1[order(sapply(full_diff1, function(x) x[[1]][1,1]), decreasing = T)]
 
+rm(list=setdiff(ls(), c('full_diff1')))
 
 #### For diff2 ####
-rm(list = ls())
-library(rstan)
-library(loo)
-library(combinat)
-library(tidyverse)
-options(mc.cores = parallel::detectCores())
-set.seed(42)
 
 # Define your data
 model_data <- read.csv('data/model_data.csv')
 model_data <- model_data %>% na.omit()
-model_data[,c(2:15,17:21)] <- scale(model_data[,c(2:15,17:21)])
+model_data <- model_data %>%
+  mutate_at(vars(-date, -week, -country), ~map_dbl(scale(.), 1))
 model_data$country_id <- as.integer(as.factor(model_data$country))
 
 # second analysis is for the dependent variable diff2
@@ -196,14 +202,14 @@ data <- list(N =nrow(model_data), sent = model_data$mean_sentiment,
              info = model_data$mean_informativeness,
              pers = model_data$mean_persuasion, ang = model_data$mean_anger,
              surp = model_data$mean_surprise, hap = model_data$mean_happiness,
-             fear = model_data$mean_fear,
+             fear = model_data$mean_fear, disgust = model_data$mean_disgust,
              diff0 = model_data$diff0,
              country_id = model_data$country_id,
              N_country = max(model_data$country_id),
              cases = model_data$cases,
              V = model_data$diff2)
 
-emotions <- c( "info", "sent","pers","ang", "surp", "hap", "fear")
+emotions <- c( "info", "sent","pers","ang", "surp", "hap", "fear", "disgust")
 
 distributions <- c("normal", "student_t", "laplace", "logistic")
 
@@ -341,7 +347,7 @@ for (i in 1:length(emotions)) {
     
     
     # Clean the environment, but keep the necessary variables
-    rm(list=setdiff(ls(), c("i", "j", "k", "data", "emotions", "distributions", "distribution", "estimates","loo_results", 'emotion')))
+    rm(list=setdiff(ls(), c("i", "j", "k", "data", "emotions", "distributions", "distribution", "estimates","loo_results", 'emotion', "full_diff1")))
   }
 }
 
@@ -349,7 +355,7 @@ for (i in 1:length(emotions)) {
 
 
 # combining the two lists
-full_diff1 <- Map(function(x, y) list(x, y), loo_results, estimates)
+full_diff2 <- Map(function(x, y) list(x, y), loo_results, estimates)
 # sorting the results
-full_diff1 <- full_diff1[order(sapply(full_diff1, function(x) x[[1]][1,1]), decreasing = T)]
+full_diff2 <- full_diff2[order(sapply(full_diff2, function(x) x[[1]][1,1]), decreasing = T)]
 
